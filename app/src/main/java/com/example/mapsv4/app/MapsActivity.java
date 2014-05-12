@@ -230,7 +230,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
                     mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                     break;
                 case(4):
-                    //mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
+                    mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
                     mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new HistoricTileProvider()));
                     break;
             }
