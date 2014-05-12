@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_gps"
+        android:icon="@android:drawable/ic_menu_mylocation"
+        android:title="@string/menu_gps"
+        android:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_pin"
+        android:icon="@android:drawable/btn_star"
+        android:title="@string/menu_pin"
+        android:showAsAction="ifRoom"  />
+    <item
+        android:id="@+id/action_info"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="@string/menu_info"
+        android:showAsAction="ifRoom"  />
+    <item
+        android:id="@+id/action_fav"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="@string/menu_fav"
+        android:showAsAction="ifRoom"  />
+
+</menu>
