@@ -10,18 +10,14 @@ Design:
   - create element design (Headline1 =  "Location Information" / "< Found Element", Headline2 = name / chosenLocation, textAbout, Headline2 = googleDB.placeName, position)
  - Navigation Drawer
   - Make headlines - Maps, About
-  - In About add:
-   - Authors
-   - Application Info
-   - Feedback
- - Icons
-  - Menu icons
-   - Home (Šumava)
-   - Pin - ?? (Better add to Favorities - like + button)
-   - Information
-   - Favorities
-  - Map icon
-   - Pin icon (marker)
+  - In About add - Authors, Application Info, Feedback
+ - Menu icons
+  - Home (Šumava)
+  - Pin - ?? (Better add to Favorities - like + button)
+  - Information
+  - Favorities
+ - Map icon
+  - Pin icon (marker)
 
 Functionality:
  - Historical Map
