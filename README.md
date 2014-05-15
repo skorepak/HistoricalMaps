@@ -25,11 +25,12 @@ Design:
 
 Functionality:
  - Main
-  - make Historical map
+  + make Historical map
    - cut maps appropriately
    - load maps in right place (GPS, 256x256 px)
    - create database table (places = id, position, radius, name, nearCity, textAbout)
   - create search engine (querry from our db and google maps db)
   - put marker (on put marker event)
   - add marked place to favorities
+  - make multilangual (Czech / Deutch / English)
  - Marginal
