@@ -3,7 +3,7 @@ HistoricalMaps
 
 ToDO:
 
-- Design:
+Design:
  - Search Box (action bar)
  - Info Box / Favorities box / Searched box
   - create element list design (Headline = "Favorities" / "Searched for" + syntax; for each element - name, nearCity)
@@ -22,7 +22,8 @@ ToDO:
    - Favorities
   - Map icon
    - Pin icon (marker)
-- Functionality
+
+Functionality:
  - Main
   - make Historical map
    - cut maps appropriately
@@ -32,4 +33,3 @@ ToDO:
   - put marker (on put marker event)
   - add marked place to favorities
  - Marginal
-  - 
