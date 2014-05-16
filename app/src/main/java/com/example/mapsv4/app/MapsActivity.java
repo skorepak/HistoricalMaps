@@ -17,17 +17,21 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
 public class MapsActivity extends FragmentActivity implements LocationListener {
 
+    private static final String TAG = "Maps::MainActivity";
     private GoogleMap mMap;
     private String[] mMapTitles;
     private DrawerLayout mDrawerLayout;
@@ -36,8 +40,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private ActionBar mBar;
-
-    private static final String TAG = "Maps::MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +61,33 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         SupportMapFragment mf = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMap = mf.getMap();
 
+        // enable GPS
         mMap.setMyLocationEnabled(true);
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        //enable MarkerListener
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                Log.i(TAG, "New marker position" + latLng.toString());
+
+                mMap.addMarker(new MarkerOptions().position(latLng).title("New Marker - " + latLng.toString()));
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(latLng)             // Sets the center of the map
+                        .zoom(9)                    // Sets the zoom
+                        .bearing(0)                 // Sets the orientation of the camera (90 = east)
+                        .tilt(15)                   // Sets the tilt of the camera to x degrees
+                        .build();
+            }
+        });
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                //provide some information for InfoPanel
+                setPosition(marker.getPosition());
+                return false;
+            }
+        });
 
         mTitle = getTitle();
         mDrawerTitle = getString(R.string.title_drawer_maps);
@@ -127,6 +154,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+        findViewById(R.id.infoPane).setVisibility(View.INVISIBLE);
         menu.findItem(R.id.action_gps).setVisible(!drawerOpen);
         menu.findItem(R.id.action_pin).setVisible(!drawerOpen);
         menu.findItem(R.id.action_info).setVisible(!drawerOpen);
@@ -148,18 +176,43 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
                 Log.i(TAG, "Moving view to Šumava");
                 return true;
             case R.id.action_pin:
+                // should be as + into favorities (kind of LIKE/DISLIKE on marker)
                 Log.i(TAG, "Click on Pin");
                 return true;
             case R.id.action_info:
+                setInfoStatus("Informations");
                 Log.i(TAG, "Informations");
                 return true;
             case R.id.action_fav:
+                setInfoStatus("Favorities");
                 Log.i(TAG, "Favorities");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    /* Called whenever we handle Info panel */
+    private void setInfoStatus(String s) {
+        // Do a null check to confirm that we have not already instantiated the map.
+        ScrollView infoPane = (ScrollView) findViewById(R.id.infoPane);
+        TextView text = (TextView) findViewById(R.id.header);
+        if (infoPane.isShown() && text.getText() == s) {
+            infoPane.setVisibility(View.INVISIBLE);
+        } else {
+            text.setText(s);
+            infoPane.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /* Called to handle position of marker */
+    private void setPosition(LatLng latLng) {
+        TextView text = (TextView) findViewById(R.id.position);
+        text.setText("Position:"
+                + "\nLatitude is  " + latLng.latitude
+                + "\nLongitude is " + latLng.longitude);
+    }
+
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
@@ -185,6 +238,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
                 .tilt(15)                   // Sets the tilt of the camera to x degrees
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        //provide some information for InfoPanel
+        setPosition(sumava);
     }
 
     @Override
