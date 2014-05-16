@@ -19,7 +19,7 @@ public class HistoricTileProvider implements TileProvider {
 
         @Override
         public Tile getTile(int x, int y, int zoom) {
-            Log.i(TAG, String.format("Tile request! X: %d, Y: %d, Zoom: %d", x, y, zoom));
+            Log.i(TAG, String.format("Tile request: x:%d, y:%d, zoom:%d", x, y, zoom));
             byte[] image = readTileImage(x, y, zoom);
             return image == null ? NO_TILE : new Tile(TILE_WIDTH, TILE_HEIGHT, image);
         }
@@ -30,7 +30,6 @@ public class HistoricTileProvider implements TileProvider {
 
             try {
                 String tileFilename = getTileFilename(x, y, zoom);
-                Log.i(TAG, "tile: "+tileFilename);
 
                 in = new FileInputStream(tileFilename);
                 buffer = new ByteArrayOutputStream();
@@ -43,12 +42,14 @@ public class HistoricTileProvider implements TileProvider {
                 }
                 buffer.flush();
 
+                Log.i(TAG, "Found: "+tileFilename);
+
                 return buffer.toByteArray();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.i(TAG, String.format("No map for: x:%d, y:%d, zoom:%d", x, y, zoom));
                 return null;
             } catch (OutOfMemoryError e) {
-                e.printStackTrace();
+                Log.e(TAG, "Out of memory", e);
                 return null;
             } finally {
                 if (in != null) try { in.close(); } catch (Exception ignored) {}

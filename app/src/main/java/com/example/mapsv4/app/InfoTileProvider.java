@@ -21,7 +21,6 @@ public class InfoTileProvider implements TileProvider {
 
     @Override
     public Tile getTile(int x, int y, int zoom) {
-        Log.i(TAG, String.format("Tile request! X: %d, Y: %d, Zoom: %d", x, y, zoom));
         byte[] image = readTileImage(x, y, zoom);
         return image == null ? NO_TILE : new Tile(TILE_WIDTH, TILE_HEIGHT, image);
     }
@@ -54,6 +53,9 @@ public class InfoTileProvider implements TileProvider {
         paint.setStyle(Paint.Style.STROKE);
 
         canvas.drawRect(0, 0, width, height, paint);
+
+        Log.i(TAG, String.format("Tile generated for: x:%d, y:%d, zoom:%d", x, y, zoom));
+
         return image;
     }
 }
