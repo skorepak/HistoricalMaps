@@ -25,7 +25,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.android.gms.maps.model.TileProvider;
 
 public class MapsActivity extends FragmentActivity implements LocationListener {
 
@@ -36,6 +35,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
     private ActionBarDrawerToggle mDrawerToggle;
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
+    private ActionBar mBar;
 
     private static final String TAG = "Maps::MainActivity";
 
@@ -46,19 +46,15 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         setUpMapIfNeeded();
 
         mMapTitles = getResources().getStringArray(R.array.planets_array);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
-
-        // Set the adapter for the list view
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mMapTitles));
-
-        // Set the list's click listener
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-        ActionBar bar = getActionBar();
-        bar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.lightblue)));
-        bar.setDisplayHomeAsUpEnabled(true);
-        bar.setDisplayShowHomeEnabled(true);
+        mBar = getActionBar();
+        mBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.lightblue)));
+        mBar.setDisplayHomeAsUpEnabled(true);
+        mBar.setDisplayShowHomeEnabled(true);
 
         SupportMapFragment mf = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMap = mf.getMap();
@@ -68,6 +64,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
 
         mTitle = getTitle();
         mDrawerTitle = getString(R.string.title_drawer_maps);
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
@@ -80,18 +77,16 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                Log.i(TAG, "Drawer Closed");
 
-                getActionBar().setTitle(mTitle);
+                mBar.setTitle(mTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                Log.i(TAG, "Drawer Opened");
 
-                getActionBar().setTitle(mDrawerTitle);
+                mBar.setTitle(mDrawerTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
@@ -185,9 +180,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         mMap.addMarker(new MarkerOptions().position(sumava).title("Šumava"));
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(sumava)      // Sets the center of the map
-                .zoom(11)                   // Sets the zoom
+                .zoom(9)                    // Sets the zoom
                 .bearing(0)                 // Sets the orientation of the camera (90 = east)
-                .tilt(0)                    // Sets the tilt of the camera to x degrees
+                .tilt(15)                   // Sets the tilt of the camera to x degrees
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
@@ -215,9 +210,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
-            mMap.clear();
             switch(position) {
                 case(0):
+                    mMap.clear();
                     mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                     break;
                 case(1):
@@ -230,8 +225,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
                     mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                     break;
                 case(4):
-                    mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
+                    //mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
                     mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new HistoricTileProvider()));
+                    break;
+                case(5):
+                    mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new InfoTileProvider()));
                     break;
             }
             mDrawerLayout.closeDrawers();

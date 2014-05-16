@@ -5,6 +5,7 @@
         <item>Satelit</item>
         <item>Terén</item>
         <item>Hibrid</item>
-        <item>Historická(!)</item>
+        <item>Historická</item>
+        <item>Tile info</item>
     </string-array>
 </resources>

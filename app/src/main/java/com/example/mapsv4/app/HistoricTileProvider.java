@@ -1,12 +1,5 @@
 package com.example.mapsv4.app;
 
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.os.Environment;
 import android.util.Log;
 
@@ -14,10 +7,8 @@ import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileProvider;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.BitSet;
 
 public class HistoricTileProvider implements TileProvider {
     private static final int TILE_WIDTH = 256;
@@ -37,7 +28,6 @@ public class HistoricTileProvider implements TileProvider {
             FileInputStream in = null;
             ByteArrayOutputStream buffer = null;
 
-
             try {
                 String tileFilename = getTileFilename(x, y, zoom);
                 Log.i(TAG, "tile: "+tileFilename);
@@ -53,14 +43,6 @@ public class HistoricTileProvider implements TileProvider {
                 }
                 buffer.flush();
 
-
-                // Start tile position debugging part
-                Bitmap bmp = textAsBitmap(x, y, zoom, 40, Color.BLACK);
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                buffer = stream;
-                // End tile position debugging part
-
                 return buffer.toByteArray();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -75,30 +57,6 @@ public class HistoricTileProvider implements TileProvider {
         }
 
         private String getTileFilename(int x, int y, int zoom) {
-            return SD_PATH + "map.png";
-            //return SD_PATH + zoom + '/' + x + '_' + y + ".png";
-        }
-
-        public Bitmap textAsBitmap(int x, int y, int zoom, float textSize, int textColor) {
-            Paint paint = new Paint();
-            paint.setTextSize(textSize);
-            paint.setColor(textColor);
-            paint.setTextAlign(Paint.Align.LEFT);
-            int width = TILE_WIDTH;
-            int height = TILE_HEIGHT;
-
-            float baseline = (int) (-paint.ascent() + 0.5f); // ascent() is negative
-
-            Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(image);
-            canvas.drawText("Zoom: " + zoom, 10, baseline + 10, paint);
-            canvas.drawText("X: " + x, 10, baseline + 60, paint);
-            canvas.drawText("Y: " + y, 10, baseline + 110, paint);
-
-            paint.setStrokeWidth(2);
-            paint.setStyle(Paint.Style.STROKE);
-
-            canvas.drawRect(0, 0, width, height, paint);
-            return image;
+            return SD_PATH + zoom + '/' + x + 'x' + y + ".png";
         }
     }
