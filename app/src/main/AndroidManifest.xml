@@ -9,8 +9,9 @@
         android:theme="@style/HoloTheme" >
         <activity
             android:name="com.example.mapsv4.app.MapsActivity"
-            android:label="@string/title_activity_maps" >
-            <intent-filter>
+            android:label="@string/title_activity_maps"
+            android:windowSoftInputMode="stateHidden">
+        <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />

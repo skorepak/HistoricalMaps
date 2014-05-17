@@ -11,7 +11,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -54,9 +53,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         mBar = getActionBar();
+        mBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         mBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.lightblue)));
         mBar.setDisplayHomeAsUpEnabled(true);
         mBar.setDisplayShowHomeEnabled(true);
+        mBar.setCustomView(R.layout.actionbar_layout);
 
         SupportMapFragment mf = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMap = mf.getMap();
@@ -144,8 +145,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_activity_actions, menu);
+        getMenuInflater().inflate(R.menu.main_activity_actions, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -155,6 +155,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         // If the nav drawer is open, hide action items related to the content view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
         findViewById(R.id.infoPane).setVisibility(View.INVISIBLE);
+        findViewById(R.id.searchView).setVisibility((!drawerOpen) ? View.VISIBLE : View.INVISIBLE);
         menu.findItem(R.id.action_gps).setVisible(!drawerOpen);
         menu.findItem(R.id.action_pin).setVisible(!drawerOpen);
         menu.findItem(R.id.action_info).setVisible(!drawerOpen);
@@ -229,7 +230,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
 
     private void setUpMap() {
         Log.i(TAG, "Setting Map up!");
-        LatLng sumava = new LatLng(49.017157, 13.517089);
+        LatLng sumava = new LatLng(49.018412, 13.518837);
         mMap.addMarker(new MarkerOptions().position(sumava).title("Šumava"));
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(sumava)      // Sets the center of the map

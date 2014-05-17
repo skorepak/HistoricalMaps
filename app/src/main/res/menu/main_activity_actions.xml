@@ -1,30 +1,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/search_box"
-        android:actionLayout="@layout/search_layout"
-        android:icon="@android:drawable/ic_menu_search"
-        android:showAsAction="always|collapseActionView"
-        android:title="@string/search" />
-    <item
-        android:id="@+id/action_pin"
-        android:icon="@android:drawable/btn_star"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_pin" />
-    <item
-        android:id="@+id/action_info"
-        android:icon="@android:drawable/ic_menu_view"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_info" />
-    <item
-        android:id="@+id/action_fav"
-        android:icon="@android:drawable/ic_menu_myplaces"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_fav" />
-    <item
         android:id="@+id/action_gps"
         android:icon="@android:drawable/ic_menu_mylocation"
         android:showAsAction="never"
         android:title="@string/menu_gps" />
-
+    <item
+        android:id="@+id/action_pin"
+        android:icon="@android:drawable/btn_star"
+        android:showAsAction="never"
+        android:title="@string/menu_pin" />
+    <item
+        android:id="@+id/action_info"
+        android:icon="@android:drawable/ic_menu_view"
+        android:showAsAction="never"
+        android:title="@string/menu_info" />
+    <item
+        android:id="@+id/action_fav"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:showAsAction="never"
+        android:title="@string/menu_fav" />
 </menu>
