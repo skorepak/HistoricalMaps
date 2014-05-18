@@ -8,6 +8,7 @@ import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
+import android.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -39,6 +40,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private ActionBar mBar;
+
+    public Locations mLocations;
+
+    private boolean showInfoTiles = false;
+    private boolean showHistoricTiles = false;
+
+    private static final String TAG = "Maps::MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,8 +127,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
             }
         };
 
+        mLocations = new Locations(this);
+
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+
     }
 
     @Override
@@ -219,8 +230,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
+            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
@@ -242,6 +252,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
 
         //provide some information for InfoPanel
         setPosition(sumava);
+        mMap.setOnMapLongClickListener(new MyLongClickListener());
     }
 
     @Override
@@ -282,14 +293,52 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
                     mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                     break;
                 case(4):
-                    //mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
-                    mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new HistoricTileProvider()));
+                    historicTiles();
                     break;
                 case(5):
-                    mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new InfoTileProvider()));
+                    infoTiles();
                     break;
             }
             mDrawerLayout.closeDrawers();
+        }
+    }
+
+    private void historicTiles() {
+        if (showHistoricTiles) {
+            showHistoricTiles = false;
+            mMap.clear();
+            if (showInfoTiles) mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new InfoTileProvider()));
+        }
+        else {
+            showHistoricTiles = true;
+            mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new HistoricTileProvider()));
+        }
+    }
+
+    private void infoTiles() {
+        if (showInfoTiles) {
+            showInfoTiles = false;
+            mMap.clear();
+            if (showHistoricTiles) mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new HistoricTileProvider()));
+        }
+        else {
+            showInfoTiles = true;
+            mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new InfoTileProvider()));
+        }
+    }
+
+    private void showDialog(LatLng latLng){
+        InsertLocationDialog f = new InsertLocationDialog();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        f.setLatLng(latLng);
+        f.show(ft, "Foo");
+    }
+
+    private class MyLongClickListener implements GoogleMap.OnMapLongClickListener {
+
+        @Override
+        public void onMapLongClick(LatLng latLng) {
+            showDialog(latLng);
         }
     }
 }
