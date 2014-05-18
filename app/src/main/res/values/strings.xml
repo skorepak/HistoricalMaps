@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">MapsV4</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="app_name" translatable="false">Historical Maps</string>
+    <string name="title_activity_maps" translatable="false">HIS-MAP</string>
+
     <string name="title_drawer_maps">Select map type</string>
     <string name="menu_gps">GPS</string>
     <string name="menu_pin">Pin</string>
     <string name="menu_info">Info</string>
-    <string name="menu_fav">Favorities</string>
+    <string name="menu_fav">Favorites</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
+    <string name="dialog_cz_hint">Czech description</string>
+    <string name="dialog_de_hint">Deutsch description</string>
+    <string name="dialog_en_hint">English description (optional)</string>
+    <string name="save">Save</string>
+    <string name="add_position">Add position</string>
 
     <string name="no_image_dir_error">Map folder not found. Please reload map files.</string>
 
