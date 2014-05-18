@@ -1,7 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-
-
     <!-- Base application theme. -->
     <style name="HoloTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <!-- Customize your theme here. -->
@@ -14,5 +12,4 @@
     <style name="MyActionBarTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:background">#33b5e5</item>
     </style>
-
 </resources>

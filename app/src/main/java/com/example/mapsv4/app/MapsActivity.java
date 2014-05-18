@@ -1,6 +1,7 @@
 package com.example.mapsv4.app;
 
 import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -8,12 +9,12 @@ import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
-import android.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 public class MapsActivity extends FragmentActivity implements LocationListener {
 
     private static final String TAG = "Maps::MainActivity";
+    public Locations mLocations;
     private GoogleMap mMap;
     private String[] mMapTitles;
     private DrawerLayout mDrawerLayout;
@@ -40,13 +42,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private ActionBar mBar;
-
-    public Locations mLocations;
-
     private boolean showInfoTiles = false;
     private boolean showHistoricTiles = false;
-
-    private static final String TAG = "Maps::MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +51,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
 
-        mMapTitles = getResources().getStringArray(R.array.planets_array);
+        mMapTitles = getResources().getStringArray(R.array.Maps);
 
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mMapTitles));
@@ -132,6 +129,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
+        this.getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     @Override
@@ -275,41 +274,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
 
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            switch(position) {
-                case(0):
-                    mMap.clear();
-                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                    break;
-                case(1):
-                    mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                    break;
-                case(2):
-                    mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-                    break;
-                case(3):
-                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                    break;
-                case(4):
-                    historicTiles();
-                    break;
-                case(5):
-                    infoTiles();
-                    break;
-            }
-            mDrawerLayout.closeDrawers();
-        }
-    }
-
     private void historicTiles() {
         if (showHistoricTiles) {
             showHistoricTiles = false;
             mMap.clear();
-            if (showInfoTiles) mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new InfoTileProvider()));
-        }
-        else {
+            if (showInfoTiles)
+                mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new InfoTileProvider()));
+        } else {
             showHistoricTiles = true;
             mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new HistoricTileProvider()));
         }
@@ -319,19 +290,47 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         if (showInfoTiles) {
             showInfoTiles = false;
             mMap.clear();
-            if (showHistoricTiles) mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new HistoricTileProvider()));
-        }
-        else {
+            if (showHistoricTiles)
+                mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new HistoricTileProvider()));
+        } else {
             showInfoTiles = true;
             mMap.addTileOverlay(new TileOverlayOptions().tileProvider(new InfoTileProvider()));
         }
     }
 
-    private void showDialog(LatLng latLng){
+    private void showDialog(LatLng latLng) {
         InsertLocationDialog f = new InsertLocationDialog();
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         f.setLatLng(latLng);
         f.show(ft, "Foo");
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            switch (position) {
+                case (0):
+                    mMap.clear();
+                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                    break;
+                case (1):
+                    mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                    break;
+                case (2):
+                    mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                    break;
+                case (3):
+                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                    break;
+                case (4):
+                    historicTiles();
+                    break;
+                case (5):
+                    infoTiles();
+                    break;
+            }
+            mDrawerLayout.closeDrawers();
+        }
     }
 
     private class MyLongClickListener implements GoogleMap.OnMapLongClickListener {
