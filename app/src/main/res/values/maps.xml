@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="Groups">
-        <item>Maps</item>
-        <item>Application</item>
-    </string-array>
+
     <string-array name="Maps">
         <item>Normal</item>
         <item>Satelit</item>
@@ -12,9 +9,11 @@
         <item>Historická</item>
         <item>Tile info</item>
     </string-array>
+
     <string-array name="Application">
         <item>About</item>
         <item>Authors</item>
         <item>Feedback</item>
     </string-array>
+
 </resources>

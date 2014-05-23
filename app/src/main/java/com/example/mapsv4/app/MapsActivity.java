@@ -1,7 +1,6 @@
 package com.example.mapsv4.app;
 
 import android.app.ActionBar;
-import android.app.FragmentTransaction;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -9,6 +8,7 @@ import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -20,7 +20,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.mapsv4.app.helper.DatabaseHelper;
+import com.example.mapsv4.app.model.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -30,20 +33,30 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MapsActivity extends FragmentActivity implements LocationListener {
 
     private static final String TAG = "Maps::MainActivity";
     public Locations mLocations;
+    // Database Helper
+    DatabaseHelper db;
+    CustomDrawerAdapter adapter;
+    List<DrawerItem> dataList;
     private GoogleMap mMap;
     private String[] mMapTitles;
-    private DrawerLayout mDrawerLayout;
+    /**private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
-    private ActionBarDrawerToggle mDrawerToggle;
+     private ActionBarDrawerToggle mDrawerToggle;**/
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private ActionBar mBar;
     private boolean showInfoTiles = false;
     private boolean showHistoricTiles = false;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +64,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
 
-        mMapTitles = getResources().getStringArray(R.array.Maps);
+        setupDrawer();
+        //setupOldDrawer();
 
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mMapTitles));
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        mMapTitles = getResources().getStringArray(R.array.Maps);
 
         mBar = getActionBar();
         mBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -70,22 +82,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         // enable GPS
         mMap.setMyLocationEnabled(true);
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-        //enable MarkerListener
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-                Log.i(TAG, "New marker position" + latLng.toString());
-
-                mMap.addMarker(new MarkerOptions().position(latLng).title("New Marker - " + latLng.toString()));
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(latLng)             // Sets the center of the map
-                        .zoom(9)                    // Sets the zoom
-                        .bearing(0)                 // Sets the orientation of the camera (90 = east)
-                        .tilt(15)                   // Sets the tilt of the camera to x degrees
-                        .build();
-            }
-        });
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -97,6 +93,19 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
 
         mTitle = getTitle();
         mDrawerTitle = getString(R.string.title_drawer_maps);
+
+        mLocations = new Locations(this);
+
+        db = new DatabaseHelper(getApplicationContext());
+
+        this.getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    private void setupOldDrawer() {
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mMapTitles));
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(
@@ -124,13 +133,56 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
             }
         };
 
-        mLocations = new Locations(this);
-
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
 
-        this.getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    private void setupDrawer() {
+        // Initializing
+        dataList = new ArrayList<DrawerItem>();
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
+                GravityCompat.START);
+
+
+        // Add Drawer Item to dataList
+        dataList.add(new DrawerItem("Maps")); // adding a header to the list
+        for (String menu : getResources().getStringArray(R.array.Maps)) {
+            dataList.add(new DrawerItem(menu, R.drawable.abc_textfield_search_right_default_holo_dark));
+        }
+
+        dataList.add(new DrawerItem("Application About"));// adding a header to the list
+        for (String menu : getResources().getStringArray(R.array.Application)) {
+            dataList.add(new DrawerItem(menu, R.drawable.abc_textfield_search_right_default_holo_dark));
+        }
+
+        adapter = new CustomDrawerAdapter(this, R.layout.custom_drawer_item,
+                dataList);
+
+        mDrawerList.setAdapter(adapter);
+
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+                R.drawable.ic_drawer, R.string.drawer_open,
+                R.string.drawer_close) {
+            public void onDrawerClosed(View view) {
+                invalidateOptionsMenu(); // creates call to
+                // onPrepareOptionsMenu()
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                invalidateOptionsMenu(); // creates call to
+                // onPrepareOptionsMenu()
+            }
+        };
+
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
     @Override
@@ -298,35 +350,94 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         }
     }
 
-    private void showDialog(LatLng latLng) {
-        InsertLocationDialog f = new InsertLocationDialog();
+    private void showDialog(LatLng latLng){
+        /*InsertLocationDialog f = new InsertLocationDialog();
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         f.setLatLng(latLng);
-        f.show(ft, "Foo");
+        f.show(ft, "Foo");*/
+
+        tryDB(latLng);
+
+        Log.i(TAG, "New marker position" + latLng.toString());
+        mMap.addMarker(new MarkerOptions().position(latLng).title("New Marker - " + latLng.toString()));
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng)             // Sets the center of the map
+                .zoom(9)                    // Sets the zoom
+                .bearing(0)                 // Sets the orientation of the camera (90 = east)
+                .tilt(15)                   // Sets the tilt of the camera to x degrees
+                .build();
+    }
+
+    private void tryDB(LatLng other) {
+        // Creating places
+        LatLng sumava = new LatLng(49.018412, 13.518837);
+        Places place1 = new Places((float) sumava.latitude, (float) sumava.longitude,
+                "Šumava", "Sumava", "Sumava");
+        Places place2 = new Places((float) other.latitude, (float) other.longitude,
+                "NeŠumava", "NeSumava", "NeSumava");
+
+        // Inserting places in db
+        long place1_id = db.createPlace(place1);
+        long place2_id = db.createPlace(place2);
+        long place3_id = db.createPlace(place1);
+
+        Log.d("Places Count", "Places Count: " + db.getAllPlaces().size());
+
+        place2.setPlaces("Mokrava", "Mokrava", "Mokrava");
+        db.updatePlace(place2);
+
+        // Getting all tag names
+        Log.d("Get Tags", "Getting All Tags");
+
+        List<Places> allPlaces = db.getAllPlaces();
+        for (Places place : allPlaces) {
+            Log.d("Place", "Name:" + place.getPlaceCZ() + "(DE-"
+                    + place.getPlaceDE() + ",EN-" + place.getPlaceEN()
+                    + ") Lat: " + place.getLatitude()
+                    + " Lng:" + place.getLongitude());
+        }
+
+        // Don't forget to close database connection
+        db.closeDB();
+
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             switch (position) {
-                case (0):
+                case (1):
                     mMap.clear();
                     mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                     break;
-                case (1):
+                case (2):
                     mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                     break;
-                case (2):
+                case (3):
                     mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
                     break;
-                case (3):
+                case (4):
                     mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                     break;
-                case (4):
+                case (5):
                     historicTiles();
                     break;
-                case (5):
+                case (6):
                     infoTiles();
+                    break;
+                case (8):
+                    Toast.makeText(getApplicationContext(), "Version: " + "\nnumber - " + BuildConfig.VERSION_CODE +
+                                    "; name - " + BuildConfig.VERSION_NAME,
+                            Toast.LENGTH_LONG
+                    ).show();
+                    break;
+                case (9):
+                    Toast.makeText(getApplicationContext(), "Authors: \nPetr Tománek \nJakub Skořepa\n Vasily Gusev",
+                            Toast.LENGTH_LONG).show();
+                    break;
+                case (10):
+                    Toast.makeText(getApplicationContext(), "Feedback",
+                            Toast.LENGTH_LONG).show();
                     break;
             }
             mDrawerLayout.closeDrawers();
