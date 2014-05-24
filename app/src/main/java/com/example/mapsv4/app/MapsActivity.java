@@ -1,6 +1,7 @@
 package com.example.mapsv4.app;
 
 import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -351,10 +352,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
     }
 
     private void showDialog(LatLng latLng){
-        /*InsertLocationDialog f = new InsertLocationDialog();
+        InsertLocationDialog f = new InsertLocationDialog();
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         f.setLatLng(latLng);
-        f.show(ft, "Foo");*/
+        f.show(ft, "Foo");
 
         tryDB(latLng);
 
@@ -384,10 +385,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener {
         Log.d("Places Count", "Places Count: " + db.getAllPlaces().size());
 
         place2.setPlaces("Mokrava", "Mokrava", "Mokrava");
+        place2.setId(1);
         db.updatePlace(place2);
 
         // Getting all tag names
-        Log.d("Get Tags", "Getting All Tags");
+        Log.d("Places", "Getting All Places");
 
         List<Places> allPlaces = db.getAllPlaces();
         for (Places place : allPlaces) {
